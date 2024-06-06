@@ -1,4 +1,4 @@
-# Release It! 🚀
+# Get GitRelease ! 🚀
 
 🚀 Generic CLI tool to automate versioning and package publishing-related tasks:
 
