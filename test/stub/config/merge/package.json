@@ -1,0 +1,7 @@
+{
+  "release-git": {
+    "git": {
+      "push": false
+    }
+  }
+}
