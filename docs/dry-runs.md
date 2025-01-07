@@ -3,7 +3,7 @@
 To show the interactivity and the commands it _would_ execute:
 
 ```bash
-release-git --dry-run
+gitreleaser --dry-run
 ```
 
 Note that read-only commands are still executed (`$ ...`), while potentially writing/mutating commands are not

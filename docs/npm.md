@@ -1,19 +1,34 @@
 # Publish to npm
 
-With a `package.json` in the current directory, release-git will let `npm` bump the version in `package.json` (and
+With a `package.json` in the current directory, gitreleaser will let `npm` bump the version in `package.json` (and
 `package-lock.json` if present), and publish to the npm registry.
 
 - If only the publish step should be skipped, use `npm.publish: false`.
 - If `package.json` should be ignored, its version should not be bumped, and nothing should be published to npm, use
-  `--no-npm` or `"npm": false` in the release-git configuration.
+  `--no-npm` or `"npm": false` in the gitreleaser configuration.
+
+## Configuration options
+
+| Option                 | Description                                                                          |
+| :--------------------- | :----------------------------------------------------------------------------------- |
+| `npm.publish`          | Set to `false` to skip the npm publish step                                          |
+| `npm.publishPath`      | Publish only a specific folder (e.g. `dist`)                                         |
+| `npm.publishArgs`      | In case extra arguments should be provided to npm for the publish operation          |
+| `npm.tag`              | Use e.g. `npm.tag=beta` to tag the package in the npm repository                     |
+| `npm.otp`              | The one-time password (OTP) can be provided from the command line (`npm.otp=123456`) |
+| `npm.ignoreVersion`    | When set to `true`, ignore the `version` from `package.json`                         |
+| `npm.allowSameVersion` | Allow new version to be the same value as the current version                        |
+| `npm.versionArgs`      | In case extra arguments should be provided to npm for the versioning operation       |
+| `npm.skipChecks`       | Skip checks on whether the npm registry is up and the user permissions               |
+| `npm.timeout`          | Timeout duration to wait for a response from the npm registry                        |
 
 ## Prerequisite checks
 
-To prevent issues later in the process, release-git first checks whether the npm registry is up, the user is
+To prevent issues later in the process, gitreleaser first checks whether the npm registry is up, the user is
 authenticated with npm and is a collaborator for the current package.
 
 Some instances of npm registries, such as Nexus, do not support `npm ping`, `npm whoami` and/or `npm access`. If the
-error is a `E400` or `E404`, release-git will give a warning but continue.
+error is a `E400` or `E404`, gitreleaser will give a warning but continue.
 
 To skip these checks, use `npm.skipChecks`.
 
@@ -100,7 +115,7 @@ of the web user interface is `http://{{host}}-/web/detail/{{packageName}}`:
 ## Yarn
 
 Using Yarn? It adds or overwrites global environment variable(s), causing authentication issues or not being able to
-publish. Set the `publishConfig.registry` value so release-git will use the `--registry` argument with this value for
+publish. Set the `publishConfig.registry` value so gitreleaser will use the `--registry` argument with this value for
 each `npm` command.
 
 ```json
@@ -113,7 +128,7 @@ each `npm` command.
 
 ## Two-factor authentication
 
-In case two-factor authentication (2FA) is enabled for the package, release-git will ask for the one-time password
+In case two-factor authentication (2FA) is enabled for the package, gitreleaser will ask for the one-time password
 (OTP).
 
 The OTP can be provided from the command line (`--npm.otp=123456`). However, providing the OTP without a prompt
@@ -143,28 +158,28 @@ version. This option may become deprecated, it is recommended to use `versionArg
 
 ## Monorepos
 
-Monorepos do not require extra configuration, but release-git handles only one package at a time. Also see how [Git
+Monorepos do not require extra configuration, but gitreleaser handles only one package at a time. Also see how [Git
 steps can be skipped][3]. This is useful if, for instance, tagging the Git repo should be skipped.
 
-To bump multiple `package.json` files in a monorepo to the same version, use the [@release-git/bumper][4] plugin.
+To bump multiple `package.json` files in a monorepo to the same version, use the [@gitreleaser/bumper][4] plugin.
 
 Also see this [monorepo recipe][5].
 
-For Yarn workspaces, see the [release-git-yarn-workspaces][6] plugin.
+For Yarn workspaces, see the [gitreleaser-yarn-workspaces][6] plugin.
 
 ## Miscellaneous
 
 - When `npm version` fails, the release is aborted (except when using [`--no-increment`][7]).
 - Learn how to [authenticate and publish from a CI/CD environment][8].
-- The `"private": true` setting in package.json will be respected, and `release-git` will skip this step.
+- The `"private": true` setting in package.json will be respected, and `gitreleaser` will skip this step.
 - Getting an `ENEEDAUTH` error while a manual `npm publish` works? Please see [#95][9].
 
 [1]: https://docs.npmjs.com/about-scopes
 [2]: https://registry.npmjs.org
 [3]: #skip-git-steps
-[4]: https://github.com/release-git/bumper
+[4]: https://github.com/gitreleaser/bumper
 [5]: ./recipes/monorepo.md
-[6]: https://github.com/release-git-plugins/workspaces
+[6]: https://github.com/gitreleaser-plugins/workspaces
 [7]: ../README.md#update-or-re-run-existing-releases
 [8]: ./ci.md#npm
-[9]: https://github.com/release-git/release-git/issues/95#issuecomment-344919384
+[9]: https://github.com/gitreleaser/gitreleaser/issues/95#issuecomment-344919384

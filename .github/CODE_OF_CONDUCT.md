@@ -44,7 +44,7 @@ event. Representation of a project may be further defined and clarified by proje
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at
-[infosulaimanbd@gmail.com][1]. The project team will review and investigate all complaints, and will respond in a way
+[dev.sulaiman@icloud.com][1]. The project team will review and investigate all complaints, and will respond in a way
 that it deems appropriate to the circumstances. The project team is obligated to maintain confidentiality with regard to
 the reporter of an incident. Further details of specific enforcement policies may be posted separately.
 
@@ -56,6 +56,6 @@ repercussions as determined by other members of the project's leadership.
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4, available at
 [http://contributor-covenant.org/version/1/4][version]
 
-[1]: mailto:infosulaimanbd@gmail.com
+[1]: mailto:dev.sulaiman@icloud.com
 [homepage]: http://contributor-covenant.org
 [version]: http://contributor-covenant.org/version/1/4/

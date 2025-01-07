@@ -1,6 +1,6 @@
 # Continuous Integration environments
 
-As release-git is increasingly used from CI/CD environments such as Travis, Circle CI or GitHub Actions, this page
+As gitreleaser is increasingly used from CI/CD environments such as Travis, Circle CI or GitHub Actions, this page
 outlines some popular ways to configure this. Do you have additional successful integrations, or experiencing issues
 with the existing ones below, feel free to [open a ticket][1].
 
@@ -25,7 +25,7 @@ When using an `SSH` url (such as `git@github.com:user/repo.git`), add the public
 
 When using an `HTTPS` url (such as `https://github.com/user/project.git`), things are slightly more complicated. For
 GitHub, add the `GITHUB_TOKEN` token to the CI/CD environment. Then make sure to add this token as a password in the
-origin url before running release-git. An example is this `.travis.yml` section:
+origin url before running gitreleaser. An example is this `.travis.yml` section:
 
 ```yaml
 script:
@@ -38,8 +38,8 @@ Replace `[user]` and `[project]` with the actual values.
 
 ## GitHub Actions
 
-To run release-git from a GitHub Action, here's an example job (fragment) to configure a Git user (to push the release
-commit), and expose the `GITHUB_TOKEN` for the GitHub Release:
+To run gitreleaser from a GitHub Action, here's an example job (fragment) to configure a Git user (to push the release
+commit), and expose `NPM_TOKEN` for publishing to the npm registry and `GITHUB_TOKEN` for the GitHub Release:
 
 ```yaml
 jobs:
@@ -56,19 +56,20 @@ jobs:
       - run: npm install
       - run: npm run release
         env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 The `fetch-depth: 0` option is only necessary when the Git history is required e.g. if using a plugin such as
-[@release-git/conventional-changelog][8].
+[@gitreleaser/conventional-changelog][8].
 
 If you enjoy watching a video, [David from Kodaps][9] created a great walk-through including setting up npm and GitHub
-tokens: [How to use GitHub Actions & Release-Git to Easily Release Your Code][10]
+tokens: [How to use GitHub Actions & GitReleaser to Easily Release Your Code][10]
 
 ## npm
 
 To publish a package to the (or any) npm registry from within a CI or CD environment such as Travis or Circle, make the
-`NPM_TOKEN` available in the `.npmrc` file. This file should look like this before release-git attempts to publish the
+`NPM_TOKEN` available in the `.npmrc` file. This file should look like this before gitreleaser attempts to publish the
 package:
 
 ```text
@@ -82,9 +83,9 @@ npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 ```
 
 This will create/update the `.npmrc` file and add the token there. Ideally you should either `.gitignore` this file,
-otherwise you might end up committing it to your repo if you are using release-git's `git` options.
+otherwise you might end up committing it to your repo if you are using gitreleaser's `git` options.
 
-Since release-git executes `npm whoami` as a [prerequisite check][11], which does not seem to respect the `.npmrc` file,
+Since gitreleaser executes `npm whoami` as a [prerequisite check][11], which does not seem to respect the `.npmrc` file,
 the `--npm.skipChecks` argument can be used.
 
 - [Creating and viewing authentication tokens][12]
@@ -131,7 +132,7 @@ draft) [GitHub][15] or [GitLab releases][16]. This works the same as on your loc
 
 ### SSH (recommended)
 
-When using release-git with GitLab CI and SSH, make sure the following requirements are met:
+When using gitreleaser with GitLab CI and SSH, make sure the following requirements are met:
 
 - `git` and `ssh` as packages are installed in the job
 - `npm install` is run beforehand
@@ -141,7 +142,7 @@ When using release-git with GitLab CI and SSH, make sure the following requireme
 ### Alpine
 
 The following example shows a pipeline that first installs Git and OpenSSH to Alpine, adds the SSH private key to the
-SSH agent, configures SSH, and eventually executes release-git:
+SSH agent, configures SSH, and eventually executes gitreleaser:
 
 ```yaml
 before_script:
@@ -157,10 +158,10 @@ before_script:
   - git config --global user.email "${CI_EMAIL}"
   - npm install
 script:
-  - npx release-git --ci
+  - npx gitreleaser --ci
 ```
 
-Note: the `git remote set-url` could also be set with the `git.pushRepo` option in the release-git configuration.
+Note: the `git remote set-url` could also be set with the `git.pushRepo` option in the gitreleaser configuration.
 
 ### Error: tag already exists
 
@@ -175,7 +176,7 @@ Here is an example script sequence for GitLab to mitigate the issue:
 - npm run release
 ```
 
-Specifically, make sure to `fetch` with the `--prune-tags` argument before release-git tries to create the Git tag:
+Specifically, make sure to `fetch` with the `--prune-tags` argument before gitreleaser tries to create the Git tag:
 
 ```json
 {
@@ -185,19 +186,20 @@ Specifically, make sure to `fetch` with the `--prune-tags` argument before relea
 }
 ```
 
-[1]: https://github.com/release-git/release-git/issues
+[1]: https://github.com/gitreleaser/gitreleaser/issues
 [2]: #git
 [3]: #github-actions
 [4]: #npm
 [5]: #github--gitlab-releases
 [6]: #gitlab-ci
 [7]: ./git.md
-[8]: https://github.com/release-git/conventional-changelog
+[8]: https://github.com/gitreleaser/conventional-changelog
 [9]: https://twitter.com/KodapsAcademy
 [10]: https://www.youtube.com/watch?v=7pBcuT7j_A0
 [11]: ./npm.md#prerequisite-checks
 [12]: https://docs.npmjs.com/creating-and-viewing-authentication-tokens
 [13]: https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow
 [14]: https://circleci.com/blog/publishing-npm-packages-using-circleci-2-0/
-[15]: https://github.com/release-git/release-git#github-releases
-[16]: https://github.com/release-git/
+[15]: https://github.com/gitreleaser/gitreleaser#github-releases
+[16]: https://github.com/gitreleaser/gitreleaser#gitlab-releases
+[17]: https://github.com/gitreleaser/gitreleaser/issues/573

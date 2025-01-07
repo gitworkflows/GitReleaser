@@ -6,7 +6,7 @@ import { readJSON } from '../lib/util.js';
 import { factory } from './util/index.js';
 import { mkTmpDir, gitAdd } from './util/helpers.js';
 
-const { git } = readJSON(new URL('../config/release-git.json', import.meta.url));
+const { git } = readJSON(new URL('../config/gitreleaser.json', import.meta.url));
 
 test.serial.beforeEach(t => {
   const bare = mkTmpDir();
@@ -24,6 +24,13 @@ test.serial('should throw if on wrong branch', async t => {
   const gitClient = factory(Git, { options });
   sh.exec('git remote remove origin');
   await t.throwsAsync(gitClient.init(), { message: /^Must be on branch dev/ });
+});
+
+test.serial('should throw if on negated branch', async t => {
+  const options = { git: { requireBranch: '!main' } };
+  const gitClient = factory(Git, { options });
+  sh.exec('git checkout -b main');
+  await t.throwsAsync(gitClient.init(), { message: /^Must be on branch !main/ });
 });
 
 test.serial('should not throw if required branch matches', async t => {
@@ -69,7 +76,7 @@ test.serial('should not throw if there are commits', async t => {
   const gitClient = factory(Git, { options });
   sh.exec('git tag 1.0.0');
   gitAdd('line', 'file', 'Add file');
-  await t.notThrowsAsync(gitClient.init());
+  await t.notThrowsAsync(gitClient.init(), 'There are no commits since the latest tag');
 });
 
 test.serial('should fail (exit code 1) if there are no commits', async t => {

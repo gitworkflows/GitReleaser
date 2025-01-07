@@ -1,6 +1,6 @@
 # Monorepo
 
-Although release-git was not originally designed for monorepos, certain workflows with multiple workspaces can still be
+Although gitreleaser was not originally designed for monorepos, certain workflows with multiple workspaces can still be
 installed.
 
 If all workspaces should be bumped to the same version and are published at the same time, then follow the two steps in
@@ -16,7 +16,7 @@ plugin. Currently using this setup myself in the [7-docs][1] monorepo. See [this
 
 ## 1. Configure root/monorepo
 
-- Install the bumper plugin: `npm install -D @release-git/bumper`
+- Install the bumper plugin: `npm install -D @gitreleaser/bumper`
 - Order the `workspaces` so a workspace depending on another comes after it. See the examples below.
 - Add a `release` script to run the `release` script of all workspaces and end with itself.
 - Make sure it contains `git.requireCleanWorkingDir: false` (to include all updated `package.json` files)
@@ -31,9 +31,9 @@ Example:
   "version": "1.0.0",
   "workspaces": ["packages/a", "packages/b", "packages/c"],
   "scripts": {
-    "release": "npm run release --workspaces && release-git"
+    "release": "npm run release --workspaces && gitreleaser"
   },
-  "release-git": {
+  "gitreleaser": {
     "git": {
       "requireCleanWorkingDir": false
     }
@@ -43,11 +43,11 @@ Example:
 
 ## 2. Configure each workspace
 
-- Add a `"release": "release-git"` script to each workspace's `package.json`.
-- Add a `release-git` config (either to `package.json` or in `.release-git.json`)
+- Add a `"release": "gitreleaser"` script to each workspace's `package.json`.
+- Add a `gitreleaser` config (either to `package.json` or in `.gitreleaser.json`)
 - Make sure it contains `git: false`
-- Add `@release-git/bumper` config if it has internal dependencies so these `dependencies` or `devDependencies` will be
-  automatically bumped during the release-git process.
+- Add `@gitreleaser/bumper` config if it has internal dependencies so these `dependencies` or `devDependencies` will be
+  automatically bumped during the gitreleaser process.
 
 ### Without internal dependencies
 
@@ -58,10 +58,10 @@ Example for a workspace without internal dependencies:
   "name": "package-a",
   "version": "1.0.0",
   "scripts": {
-    "release": "release-git"
+    "release": "gitreleaser"
   },
   "dependencies": {},
-  "release-git": {
+  "gitreleaser": {
     "git": false
   }
 }
@@ -76,7 +76,7 @@ Example for a workspace with internal dependencies:
   "name": "package-c",
   "version": "1.0.0",
   "scripts": {
-    "release": "release-git"
+    "release": "gitreleaser"
   },
   "dependencies": {
     "package-a": "1.0.0"
@@ -84,10 +84,10 @@ Example for a workspace with internal dependencies:
   "devDependencies": {
     "package-b": "1.0.0"
   },
-  "release-git": {
+  "gitreleaser": {
     "git": false,
     "plugins": {
-      "@release-git/bumper": {
+      "@gitreleaser/bumper": {
         "out": {
           "file": "package.json",
           "path": ["dependencies.package-a", "devDependencies.package-b"]

@@ -58,8 +58,8 @@ Unsure about whether you should open a pull request? Feel free to discuss it fir
 [Fork][9] the repository to get started, and set it up on your machine:
 
 ```bash
-git clone https://github.com/<your-github-username>/release-git
-cd release-git
+git clone https://github.com/<your-github-username>/gitreleaser
+cd gitreleaser
 npm install
 ```
 
@@ -69,24 +69,24 @@ Verify the tests are passing:
 npm test
 ```
 
-To use your modified version of release-git in your project, [npm-link][10] it:
+To use your modified version of gitreleaser in your project, [npm-link][10] it:
 
 ```bash
-# From your release-git clone:
+# From your gitreleaser clone:
 npm link
 
-# From your project that uses release-git:
-npm link release-git
+# From your project that uses gitreleaser:
+npm link gitreleaser
 ```
 
 [1]: ./CODE_OF_CONDUCT.md
-[2]: https://github.com/release-git/release-git/issues/new
-[3]: https://github.com/release-git/release-git/releases
-[4]: https://github.com/release-git/release-git/blob/main/README.md
+[2]: https://github.com/gitreleaser/gitreleaser/issues/new
+[3]: https://github.com/gitreleaser/gitreleaser/releases
+[4]: https://github.com/gitreleaser/gitreleaser/blob/main/README.md
 [5]: ../README.md#troubleshooting--debugging
 [6]:
   https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
 [7]: https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github
-[8]: https://github.com/release-git/release-git/actions
+[8]: https://github.com/gitreleaser/gitreleaser/actions
 [9]: https://docs.github.com/en/get-started/quickstart/fork-a-repo
 [10]: https://docs.npmjs.com/cli/link.html

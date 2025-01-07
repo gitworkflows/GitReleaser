@@ -1,9 +1,9 @@
-# Use release-git programmatically
+# Use gitreleaser programmatically
 
-From Node.js scripts, release-git can also be used as a dependency:
+From Node.js scripts, gitreleaser can also be used as a dependency:
 
 ```js
-import release from 'release-git';
+import release from 'gitreleaser';
 
 release(options).then(output => {
   console.log(output);

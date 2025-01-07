@@ -1,10 +1,20 @@
 import path from 'node:path';
+import { patchFs } from 'fs-monkey';
 import test from 'ava';
 import sinon from 'sinon';
-import mock from 'mock-fs';
+import { vol } from 'memfs';
 import npm from '../lib/plugin/npm/npm.js';
 import { factory, runTasks } from './util/index.js';
 import { getArgs } from './util/helpers.js';
+
+const mockFs = volume => {
+  vol.fromJSON(volume);
+  const unpatch = patchFs(vol);
+  return () => {
+    vol.reset();
+    unpatch();
+  };
+};
 
 test('should return npm package url', t => {
   const options = { npm: { name: 'my-cool-package' } };
@@ -125,12 +135,12 @@ test('should add registry to commands when specified', async t => {
   const exec = sinon.stub(npmClient.shell, 'exec').resolves();
   exec.withArgs('npm whoami --registry registry.example.org').resolves('john');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git --registry registry.example.org/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser --registry registry.example.org/)
     .resolves(JSON.stringify({ john: ['write'] }));
   await runTasks(npmClient);
   t.is(exec.args[0][0], 'npm ping --registry registry.example.org');
   t.is(exec.args[1][0], 'npm whoami --registry registry.example.org');
-  t.regex(exec.args[2][0], /npm show release-git@[a-z]+ version --registry registry\.example\.org/);
+  t.regex(exec.args[2][0], /npm show gitreleaser@[a-z]+ version --registry registry\.example\.org/);
   exec.restore();
 });
 
@@ -139,7 +149,7 @@ test('should not throw when executing tasks', async t => {
   const exec = sinon.stub(npmClient.shell, 'exec').resolves();
   exec.withArgs('npm whoami').resolves('john');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser/)
     .resolves(JSON.stringify({ john: ['write'] }));
   await t.notThrowsAsync(runTasks(npmClient));
   exec.restore();
@@ -188,7 +198,7 @@ test('should not throw if npm returns 404 for unsupported ping', async t => {
   exec.withArgs('npm ping').rejects(new Error(pingError));
   exec.withArgs('npm whoami').resolves('john');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser/)
     .resolves(JSON.stringify({ john: ['write'] }));
   await runTasks(npmClient);
   t.is(exec.lastCall.args[0].trim(), 'npm publish . --tag latest');
@@ -208,8 +218,8 @@ test('should throw if user is not a collaborator (v9)', async t => {
   const exec = sinon.stub(npmClient.shell, 'exec').resolves();
   exec.withArgs('npm whoami').resolves('ada');
   exec.withArgs('npm --version').resolves('9.2.0');
-  exec.withArgs('npm access list collaborators --json release-git').resolves(JSON.stringify({ john: ['write'] }));
-  await t.throwsAsync(runTasks(npmClient), { message: /^User ada is not a collaborator for release-git/ });
+  exec.withArgs('npm access list collaborators --json gitreleaser').resolves(JSON.stringify({ john: ['write'] }));
+  await t.throwsAsync(runTasks(npmClient), { message: /^User ada is not a collaborator for gitreleaser/ });
   exec.restore();
 });
 
@@ -219,9 +229,9 @@ test('should throw if user is not a collaborator (v8)', async t => {
   exec.withArgs('npm whoami').resolves('ada');
   exec.withArgs('npm --version').resolves('8.2.0');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser/)
     .resolves(JSON.stringify({ john: ['write'] }));
-  await t.throwsAsync(runTasks(npmClient), { message: /^User ada is not a collaborator for release-git/ });
+  await t.throwsAsync(runTasks(npmClient), { message: /^User ada is not a collaborator for gitreleaser/ });
   exec.restore();
 });
 
@@ -230,10 +240,10 @@ test('should not throw if user is not a collaborator on a new package', async t 
   const exec = sinon.stub(npmClient.shell, 'exec').resolves();
   exec.withArgs('npm whoami').resolves('ada');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser/)
     .rejects(
       new Error(
-        'npm ERR! code E404\nnpm ERR! 404 Not Found - GET https://registry.npmjs.org/-/package/release-git/collaborators?format=cli - File not found'
+        'npm ERR! code E404\nnpm ERR! 404 Not Found - GET https://registry.npmjs.org/-/package/gitreleaser/collaborators?format=cli - File not found'
       )
     );
   await t.notThrowsAsync(runTasks(npmClient));
@@ -292,7 +302,7 @@ test('should publish', async t => {
   const exec = sinon.stub(npmClient.shell, 'exec').resolves();
   exec.withArgs('npm whoami').resolves('john');
   exec
-    .withArgs(/npm access (list collaborators --json|ls-collaborators) release-git/)
+    .withArgs(/npm access (list collaborators --json|ls-collaborators) gitreleaser/)
     .resolves(JSON.stringify({ john: ['write'] }));
   await runTasks(npmClient);
   t.is(exec.lastCall.args[0].trim(), 'npm publish . --tag latest');
@@ -315,7 +325,7 @@ test('should skip checks', async t => {
 });
 
 test('should publish to a different/scoped registry', async t => {
-  mock({
+  const resetFs = mockFs({
     [path.resolve('package.json')]: JSON.stringify({
       name: '@my-scope/my-pkg',
       version: '1.0.0',
@@ -349,10 +359,11 @@ test('should publish to a different/scoped registry', async t => {
   ]);
 
   exec.restore();
+  resetFs();
 });
 
 test('should not publish when `npm version` fails', async t => {
-  mock({
+  const resetFs = mockFs({
     [path.resolve('package.json')]: JSON.stringify({
       name: '@my-scope/my-pkg',
       version: '1.0.0'
@@ -384,6 +395,7 @@ test('should not publish when `npm version` fails', async t => {
   ]);
 
   exec.restore();
+  resetFs();
 });
 
 test('should add allow-same-version argument', async t => {

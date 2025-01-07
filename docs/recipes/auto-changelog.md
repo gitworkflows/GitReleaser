@@ -10,12 +10,12 @@ Add auto-changelog to the project:
 npm install --save-dev auto-changelog
 ```
 
-Example configuration in the release-git config:
+Example configuration in the gitreleaser config:
 
 ```json
 {
   "git": {
-    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-git/release-git/main/templates/changelog-compact.hbs"
+    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/gitreleaser/gitreleaser/main/templates/changelog-compact.hbs"
   },
   "hooks": {
     "after:bump": "npx auto-changelog -p"
@@ -52,7 +52,7 @@ The template above [changelog-compact.hbs][3] can also be used directly from her
 ```json
 {
   "git": {
-    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-git/release-git/main/templates/changelog-compact.hbs"
+    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/gitreleaser/gitreleaser/main/templates/changelog-compact.hbs"
   },
   "hooks": {
     "after:bump": "npx auto-changelog -p"
@@ -66,10 +66,10 @@ can use this example:
 ```json
 {
   "git": {
-    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-git/release-git/main/templates/changelog-compact.hbs"
+    "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/gitreleaser/gitreleaser/main/templates/changelog-compact.hbs"
   },
   "hooks": {
-    "after:bump": "npx auto-changelog --commit-limit false --template https://raw.githubusercontent.com/release-git/release-git/main/templates/keepachangelog.hbs"
+    "after:bump": "npx auto-changelog --commit-limit false --template https://raw.githubusercontent.com/gitreleaser/gitreleaser/main/templates/keepachangelog.hbs"
   }
 }
 ```

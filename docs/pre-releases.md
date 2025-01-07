@@ -1,6 +1,6 @@
 # Manage pre-releases
 
-With release-git, it's easy to create pre-releases: a version of your software that you want to make available, while
+With gitreleaser, it's easy to create pre-releases: a version of your software that you want to make available, while
 it's not in the stable semver range yet. Often "alpha", "beta", and "rc" (release candidate) are used as identifier for
 pre-releases.
 
@@ -8,7 +8,7 @@ An example. The `awesome-pkg` is at version 1.3.0, and work is done for a new ma
 of the new major version:
 
 ```bash
-release-git major --preRelease=beta
+gitreleaser major --preRelease=beta
 ```
 
 This will tag and release version `2.0.0-beta.0`. Notes:
@@ -20,33 +20,33 @@ This will tag and release version `2.0.0-beta.0`. Notes:
 The above command is actually a shortcut for:
 
 ```bash
-release-git premajor --preReleaseId=beta --npm.tag=beta --github.preRelease
+gitreleaser premajor --preReleaseId=beta --npm.tag=beta --github.preRelease
 ```
 
 Consecutive beta releases (`2.0.0-beta.1` and so on):
 
 ```bash
-release-git --preRelease
+gitreleaser --preRelease
 ```
 
 And when ready to release the next phase (e.g. release candidate, in this case `2.0.0-rc.0`):
 
 ```bash
-release-git --preRelease=rc
+gitreleaser --preRelease=rc
 ```
 
 And eventually, for `2.0.0`:
 
 ```bash
-release-git major
+gitreleaser major
 ```
 
-<img src="./assets/release-git-prerelease.gif?raw=true" height="524">
+<img src="./assets/gitreleaser-prerelease.gif?raw=true" height="524">
 
 When all commits since the latest major tag should be added to the changelog, use `--git.tagExclude`:
 
 ```bash
-release-git major --git.tagExclude='*[-]*'
+gitreleaser major --git.tagExclude='*[-]*'
 ```
 
 This will find the latest major matching tag, excluding the pre-release tags, which normally include `-` in their name.
@@ -55,15 +55,21 @@ Let's go back to when the latest release was `2.0.0-rc.0`. We added new features
 yet, but instead in a later v2.1. A new pre-release id can be made for the minor release after in `2.1.0-alpha.0`:
 
 ```bash
-release-git preminor --preRelease=alpha
+gitreleaser preminor --preRelease=alpha
+```
+
+Use `--preReleaseBase=1` to start counting at `1`. The first example at `1.3.0` will now bump to `2.0.0-beta.1` instead:
+
+```bash
+gitreleaser major --preRelease=beta --preReleaseBase=1
 ```
 
 Notes:
 
 - Pre-releases work in tandem with [recommended bumps][2].
-- You can still override individual options, e.g. `release-git --preRelease=rc --npm.tag=next`.
+- You can still override individual options, e.g. `gitreleaser --preRelease=rc --npm.tag=next`.
 - See [semver.org][3] for more details about semantic versioning.
 
 [1]: https://docs.npmjs.com/cli/dist-tag
-[2]: https://github.com/release-git/conventional-changelog
+[2]: https://github.com/gitreleaser/conventional-changelog
 [3]: http://semver.org

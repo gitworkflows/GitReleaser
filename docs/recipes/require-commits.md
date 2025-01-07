@@ -1,7 +1,7 @@
 # Require Commits
 
-By default, release-git does not check the number of commits upfront. Configure `"git.requireCommits": true` to exit the
-release-git process if there are no commits since the latest tag.
+By default, gitreleaser does not check the number of commits upfront. Configure `"git.requireCommits": true` to exit the
+gitreleaser process if there are no commits since the latest tag.
 
 ### Using `hooks.before:init` as well?
 
@@ -24,5 +24,5 @@ scripts to `hooks.after:init`, or adding a custom shell script like this:
 Or even take it upfront like this:
 
 ```bash
-[ "$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)" = "0" ] || release-git
+[ "$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)" = "0" ] || gitreleaser
 ```

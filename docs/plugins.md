@@ -1,7 +1,7 @@
 # Plugins
 
-release-git is a pluggable task runner. If it can either be written in Node.js, or executed from the shell, it can be
-integrated in the release-git process.
+gitreleaser is a pluggable task runner. If it can either be written in Node.js, or executed from the shell, it can be
+integrated in the gitreleaser process.
 
 ## Contents
 
@@ -17,12 +17,12 @@ Plugins allow additional and custom actions in the release process, such as:
 - Publish the package to any registry (this is language-agnostic, e.g. Ruby, Python, ...).
 - Implement a different strategy to generate changelogs and/or release notes.
 - Trigger web hooks (e.g. post a message to a Slack channel).
-- Use a different VCS, such as Mercurial (example: [@release-git/mercurial][5]).
+- Use a different VCS, such as Mercurial (example: [@gitreleaser/mercurial][5]).
 - Use Node.js directly (instead of executing shell scripts configured in `hooks.*`).
 - Replace existing plugins. For instance, integrate with the npm registry using their [programmatic API][6] (as opposed
-  to calling `npm publish` in a child process like release-git itself does).
+  to calling `npm publish` in a child process like gitreleaser itself does).
 
-Internally, release-git uses its own plugin architecture and includes the following plugins:
+Internally, gitreleaser uses its own plugin architecture and includes the following plugins:
 
 - `git`
 - `github`
@@ -41,20 +41,20 @@ Each plugin has a different responsibility, and each enables itself:
 ## Using a plugin
 
 Plugins are local to the project, or external npm packages. Plugin configuration consists of a module name with options.
-This example uses the `release-git-plugin` module and is configured in `package.json`:
+This example uses the `gitreleaser-plugin` module and is configured in `package.json`:
 
 ```json
 {
   "devDependencies": {
-    "release-git": "*",
-    "release-git-plugin": "*"
+    "gitreleaser": "*",
+    "gitreleaser-plugin": "*"
   },
-  "release-git": {
+  "gitreleaser": {
     "github": {
       "release": true
     },
     "plugins": {
-      "release-git-plugin": {
+      "gitreleaser-plugin": {
         "key": "value"
       }
     }
@@ -62,12 +62,12 @@ This example uses the `release-git-plugin` module and is configured in `package.
 }
 ```
 
-Alternatively, here's a `release-git-plugin` as a local module:
+Alternatively, here's a `gitreleaser-plugin` as a local module:
 
 ```json
 {
   "plugins": {
-    "./scripts/release-git-plugin.js": {
+    "./scripts/gitreleaser-plugin.js": {
       "key": "value"
     }
   }
@@ -78,22 +78,22 @@ Alternatively, here's a `release-git-plugin` as a local module:
 
 To create a plugin, extend the `Plugin` class, and implement one or more release-cycle methods. See the "interface"
 below (where none of the methods is required). Any of these methods can be `async`. See this [test helper][7] to get an
-idea of the methods a release-git plugin can implement.
+idea of the methods a gitreleaser plugin can implement.
 
-Note that `release-git` should be a `peerDependency` (and probably also a `devDependency` to use its helpers in the
+Note that `gitreleaser` should be a `peerDependency` (and probably also a `devDependency` to use its helpers in the
 plugin tests). Here's an example `package.json`:
 
 ```json
 {
-  "name": "release-git-plugin",
+  "name": "gitreleaser-plugin",
   "version": "1.0.0",
-  "description": "My release-git plugin",
+  "description": "My gitreleaser plugin",
   "main": "index.js",
   "peerDependencies": {
-    "release-git": "^14.2.0"
+    "gitreleaser": "^14.2.0"
   },
   "devDependencies": {
-    "release-git": "^14.2.0"
+    "gitreleaser": "^14.2.0"
   }
 }
 ```
@@ -219,7 +219,7 @@ Provide the name of the package being released.
 
 #### getLatestVersion() → SemVer
 
-Implement `getLatestVersion` and return the latest version prior to the current release, so release-git can determine
+Implement `getLatestVersion` and return the latest version prior to the current release, so gitreleaser can determine
 the next version.
 
 #### getInitialOptions(options, pluginName) → Object
@@ -304,12 +304,12 @@ If the prompt receives a "No" from the user, the `task` callback is not executed
 
 #### this.exec() → Promise
 
-Execute commands in the child process (i.e. the shell). This is used extensively by release-git to execute `git` and
+Execute commands in the child process (i.e. the shell). This is used extensively by gitreleaser to execute `git` and
 `npm` commands. Be aware of cross-OS compatibility.
 
 Use template variables to render replacements. For instance, the command `git log ${latestTag}...HEAD` becomes
 `git log v1.2.3...HEAD` before being executed. The replacements are all configuration options (with the default values
-in [config/release-git.json][18]), plus the following additional variables:
+in [config/gitreleaser.json][18]), plus the following additional variables:
 
 ```text
 version
@@ -331,8 +331,8 @@ this.exec('git log', { options: { write: false } });
 
 #### this.debug() → void
 
-Insert `this.debug(...)` statements to log interesting details when `NODE_DEBUG=release-git:* release-git ...` is used.
-The output is namespaced automatically (e.g. `release-git:foo My log output`).
+Insert `this.debug(...)` statements to log interesting details when `NODE_DEBUG=gitreleaser:* gitreleaser ...` is used.
+The output is namespaced automatically (e.g. `gitreleaser:foo My log output`).
 
 #### this.log() → void
 
@@ -359,7 +359,7 @@ something is used throughout the release process. This allows a plugin to be ahe
 
 After this, the `beforeBump`, `bump` and `beforeRelease` methods are executed for each plugin in the same order.
 
-And finally, for `release` and `afterRelease` the order is reversed, so that tasks can be executed after release-git
+And finally, for `release` and `afterRelease` the order is reversed, so that tasks can be executed after gitreleaser
 core plugins are done. Examples include to trigger deployment hooks, or send a notification to indicate a successfull
 release or deployment.
 
@@ -374,18 +374,18 @@ Here's an example:
 
 ## Available & example plugins
 
-- All packages tagged with [`"release-git-plugin"` on npm][19].
+- All packages tagged with [`"gitreleaser-plugin"` on npm][19].
 - Recipe: [my-version][20] - example plugin
-- [Internal release-git plugins][21]
+- [Internal gitreleaser plugins][21]
 
 [1]: #overview
 [2]: #using-a-plugin
 [3]: #creating-a-plugin
 [4]: #available--example-plugins
-[5]: https://github.com/release-git/mercurial
+[5]: https://github.com/gitreleaser/mercurial
 [6]: https://github.com/npm/libnpm
-[7]: https://github.com/release-git/release-git/blob/main/test/util/index.js#L54
-[8]: https://github.com/release-git/plugin-starterkit
+[7]: https://github.com/gitreleaser/gitreleaser/blob/main/test/util/index.js#L54
+[8]: https://github.com/gitreleaser/plugin-starterkit
 [9]: #interface-overview
 [10]: #static-methods
 [11]: #release-cycle-methods
@@ -395,7 +395,7 @@ Here's an example:
 [15]: #step
 [16]: https://github.com/SBoudrias/Inquirer.js
 [17]: https://github.com/SBoudrias/Inquirer.js/#objects
-[18]: ../config/release-git.json
-[19]: https://www.npmjs.com/search?q=keywords:release-git-plugin
-[20]: https://github.com/release-git/release-git/blob/main/docs/recipes/my-version.md
-[21]: https://github.com/release-git/release-git/tree/main/lib/plugin
+[18]: ../config/gitreleaser.json
+[19]: https://www.npmjs.com/search?q=keywords:gitreleaser-plugin
+[20]: https://github.com/gitreleaser/gitreleaser/blob/main/docs/recipes/my-version.md
+[21]: https://github.com/gitreleaser/gitreleaser/tree/main/lib/plugin

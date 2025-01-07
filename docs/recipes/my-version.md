@@ -4,7 +4,7 @@ This example reads a `VERSION` file, bumps it, and publishes to a package reposi
 `./VERSION` file actually exists.
 
 ```javascript
-import { Plugin } from 'release-git';
+import { Plugin } from 'gitreleaser';
 import fs from 'fs';
 import path from 'path';
 

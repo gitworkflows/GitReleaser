@@ -7,14 +7,30 @@ part][2] is configured correctly.
 [GitLab releases][1] work just like GitHub releases:
 
 - Configure `gitlab.release: true`.
-- Obtain a [personal access token][3] (release-git only needs the "api" scope).
+- Obtain a [personal access token][3] (gitreleaser only needs the "api" scope).
 - Make sure the token is [available as an environment variable][4].
 
 GitLab Releases do not support pre-releases or drafts.
 
+## Configuration options
+
+| Option                            | Description                                                         |
+| :-------------------------------- | :------------------------------------------------------------------ |
+| `gitlab.release`                  | Set to `false` to skip the GitLab publish step                      |
+| `gitlab.releaseName`              | Set the release name (default: `Release ${version}`)                |
+| `gitlab.releaseNotes`             | Override the release notes with custom notes                        |
+| `gitlab.milestones`               | Associate one or more milestones with a GitLab release              |
+| `gitlab.tokenRef`                 | GitLab token environment variable name (default: `GITLAB_TOKEN`)    |
+| `gitlab.tokenHeader`              | _TODO_                                                              |
+| `gitlab.certificateAuthorityFile` | _TODO_                                                              |
+| `gitlab.secure`                   | _TODO_                                                              |
+| `gitlab.assets`                   | Glob pattern path to assets to add to the GitLab release            |
+| `gitlab.origin`                   | _TODO_                                                              |
+| `gitlab.skipChecks`               | Skip checks on `GITLAB_TOKEN` environment variable and milestone(s) |
+
 ## Prerequisite checks
 
-First, release-git will check whether the `GITLAB_TOKEN` environment variable is set. Otherwise it will throw an error
+First, gitreleaser will check whether the `GITLAB_TOKEN` environment variable is set. Otherwise it will throw an error
 and exit. Then, it will authenticate, and verify whether the current user is a collaborator and authorized to publish a
 release.
 
@@ -23,11 +39,11 @@ To skip these checks, use `gitlab.skipChecks`.
 ## Release notes
 
 By default, the output of `git.changelog` is used for the GitLab release notes. This is the printed `Changelog: ...`
-when release-git boots. This can be overridden with the `gitlab.releaseNotes` option to customize the release notes for
+when gitreleaser boots. This can be overridden with the `gitlab.releaseNotes` option to customize the release notes for
 the GitLab release. This will be invoked just before the actual GitLab release itself.
 
-The value can either be a string or a function but a function is only supported when configuring release-git using
-`.release-git.js` or `.release-git.cjs` file.
+The value can either be a string or a function but a function is only supported when configuring gitreleaser using
+`.gitreleaser.js` or `.gitreleaser.cjs` file.
 
 When the value is a string, it's executed as a shell script. Make sure it outputs to `stdout`. An example:
 
@@ -71,7 +87,7 @@ of the corresponding milestones, for example:
 }
 ```
 
-Note that creating a GitLab release will fail if one of the given milestones does not exist. release-git will check this
+Note that creating a GitLab release will fail if one of the given milestones does not exist. gitreleaser will check this
 before doing the release. To skip this check, use `gitlab.skipChecks`.
 
 ## Attach binary assets
@@ -84,6 +100,37 @@ download from the project's releases page. Example:
 {
   "gitlab": {
     "release": true,
+    "assets": ["dist/*.dmg"]
+  }
+}
+```
+
+Version 17.2 of Gitlab [started enforcing a new URL format][6] for uploaded assets. If you are using this version (or
+later), you should set the `useIdsForUrls` flag to `true`:
+
+```json
+{
+  "gitlab": {
+    "release": true,
+    "useIdsForUrls": true,
+    "assets": ["dist/*.dmg"]
+  }
+}
+```
+
+### Asset Location
+
+By default release assets are uploaded to the project's Markdown uploads API. If you want to use GitLab's Generic
+packages Repository set `useGenericPackageRepositoryForAssets` flag to true. `useIdsForUrls` is ignored from this API.
+You can set the package name to be uploaded to using `genericPackageRepositoryName` by default the name is
+`gitreleaser`.
+
+```json
+{
+  "gitlab": {
+    "release": true,
+    "useGenericPackageRepositoryForAssets": true,
+    "genericPackageRepositoryName": "gitreleaser",
     "assets": ["dist/*.dmg"]
   }
 }
@@ -109,6 +156,22 @@ specify the root CA certificate with `certificateAuthorityFile`, for example:
 }
 ```
 
+Alternatively, if you want to disable the server certificate verification against the list of supplied CAs, you can set
+the `secure` flag to false:
+
+```json
+{
+  "gitlab": {
+    "release": true,
+    "tokenHeader": "PRIVATE-TOKEN",
+    "secure": false
+  }
+}
+```
+
+The `secure` option is passed down to [got][7], which in turn also forwards it to node's [`https.request`][8] method as
+the `rejectUnauthorized` option. The default value of `rejectUnauthorized` is `true`.
+
 ## Update the latest release
 
 The latest GitLab release can be updated, e.g. to update the releases notes or add release assets.
@@ -122,11 +185,14 @@ Use the other options to update the release, such as `--gitlab.assets` to add as
 Example command to add assets to the latest release:
 
 ```bash
-release-git --no-increment --no-git --gitlab.release --gitlab.assets=*.zip
+gitreleaser --no-increment --no-git --gitlab.release --gitlab.assets=*.zip
 ```
 
 [1]: https://docs.gitlab.com/ce/user/project/releases/
 [2]: ./git.md
-[3]: https://gitlab.com/profile/personal_access_tokens
+[3]: https://docs.gitlab.com/ce/user/profile/personal_access_tokens
 [4]: ./environment-variables.md
 [5]: ./changelog.md
+[6]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/156939
+[7]: https://github.com/sindresorhus/got
+[8]: https://nodejs.org/api/https.html#httpsrequestoptions-callback

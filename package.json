@@ -1,43 +1,77 @@
 {
-  "name": "release-git",
-  "version": "16.0.0",
+  "name": "gitreleaser",
   "description": "Generic CLI tool to automate versioning and package publishing-related tasks.",
-  "keywords": [
-    "build",
-    "changelog",
-    "commit",
-    "distribution",
-    "git",
-    "github",
-    "gitlab",
-    "interactive",
-    "ci",
-    "npm",
-    "publish",
-    "push",
-    "release",
-    "release-git",
-    "repository",
-    "script",
-    "shell",
-    "tag",
-    "tool",
-    "version",
-    "semver",
-    "plugin"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/release-git/release-git.git"
+  "version": "1.0.0",
+  "author": {
+    "email": "dev.sulaiman@icloud.com",
+    "name": "Md Sulaiman"
   },
-  "homepage": "https://github.com/release-git/release-git#readme",
-  "bugs": "https://github.com/release-git/release-git/issues",
   "bin": {
-    "release-git": "bin/release-git.js"
+    "gitreleaser": "bin/gitreleaser.js"
   },
-  "type": "module",
+  "bugs": "https://github.com/gitreleaser/gitreleaser/issues",
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@octokit/rest": "^21.0.2",
+    "async-retry": "^1.3.3",
+    "chalk": "^5.4.1",
+    "ci-info": "^4.1.0",
+    "cosmiconfig": "^9.0.0",
+    "execa": "^9.5.2",
+    "git-url-parse": "^16.0.0",
+    "globby": "^14.0.2",
+    "inquirer": "^12.3.0",
+    "issue-parser": "^7.0.1",
+    "lodash": "^4.17.21",
+    "mime-types": "^2.1.35",
+    "new-github-release-url": "^2.0.0",
+    "open": "^10.1.0",
+    "ora": "^8.1.1",
+    "os-name": "^6.0.0",
+    "proxy-agent": "^6.5.0",
+    "semver": "^7.6.3",
+    "shelljs": "^0.8.5",
+    "undici": "^7.2.0",
+    "update-notifier": "^7.3.1",
+    "url-join": "^5.0.0",
+    "wildcard-match": "^5.1.4",
+    "yargs-parser": "^21.1.1"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.4",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
+    "@octokit/request-error": "^6.1.6",
+    "@types/node": "^22.10.5",
+    "ava": "^6.2.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-ava": "^15.0.1",
+    "eslint-plugin-import-x": "^4.6.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "fs-monkey": "^1.0.6",
+    "globals": "^15.14.0",
+    "installed-check": "^9.3.0",
+    "knip": "^5.41.1",
+    "memfs": "^4.15.3",
+    "mock-stdio": "^1.0.3",
+    "nock": "14.0.0-beta.8",
+    "prettier": "^3.4.2",
+    "remark-cli": "^12.0.1",
+    "remark-preset-web": "^1.1.1",
+    "sinon": "^19.0.2",
+    "strip-ansi": "^7.1.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": "^20.9.0 || >=22.0.0"
+  },
   "exports": {
-    ".": "./lib/index.js",
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js"
+    },
     "./package.json": "./package.json",
     "./test/util/index.js": "./test/util/index.js"
   },
@@ -45,77 +79,60 @@
     "bin",
     "config",
     "lib",
-    "test"
+    "test",
+    "schema",
+    "types"
   ],
-  "scripts": {
-    "knip": "knip",
-    "lint": "eslint lib test",
-    "format": "prettier --write \"{lib,test}/**/*.js\"",
-    "docs": "remark README.md 'docs/**/*.md' '.github/*.md' -o",
-    "test": "ava --no-worker-threads",
-    "release": "./bin/release-git.js"
-  },
-  "author": {
-    "email": "infosulaimanbd@gmail.com",
-    "name": "Md Sulaiman"
-  },
+  "funding": [
+    {
+      "type": "patreon",
+      "url": "https://patreon.com/khulnasoft"
+    }
+  ],
+  "homepage": "https://github.com/gitreleaser/gitreleaser#readme",
+  "keywords": [
+    "build",
+    "changelog",
+    "ci",
+    "commit",
+    "distribution",
+    "git",
+    "github",
+    "gitlab",
+    "gitreleaser",
+    "interactive",
+    "npm",
+    "plugin",
+    "publish",
+    "push",
+    "release",
+    "repository",
+    "script",
+    "semver",
+    "shell",
+    "tag",
+    "tool",
+    "version"
+  ],
   "license": "MIT",
-  "dependencies": {
-    "@iarna/toml": "2.2.5",
-    "@octokit/rest": "19.0.13",
-    "async-retry": "1.3.3",
-    "chalk": "5.3.0",
-    "cosmiconfig": "8.2.0",
-    "execa": "7.1.1",
-    "git-url-parse": "13.1.0",
-    "globby": "13.2.1",
-    "got": "13.0.0",
-    "inquirer": "9.2.7",
-    "is-ci": "3.0.1",
-    "issue-parser": "6.0.0",
-    "lodash": "4.17.21",
-    "mime-types": "2.1.35",
-    "new-github-release-url": "2.0.0",
-    "node-fetch": "3.3.1",
-    "open": "9.1.0",
-    "ora": "6.3.1",
-    "os-name": "5.1.0",
-    "promise.allsettled": "1.0.6",
-    "proxy-agent": "6.2.1",
-    "semver": "7.5.3",
-    "shelljs": "0.8.5",
-    "update-notifier": "6.0.2",
-    "url-join": "5.0.0",
-    "wildcard-match": "5.1.2",
-    "yargs-parser": "21.1.1"
-  },
-  "devDependencies": {
-    "@octokit/request-error": "3.0.3",
-    "ava": "5.3.1",
-    "eslint": "8.44.0",
-    "eslint-config-prettier": "8.8.0",
-    "eslint-plugin-ava": "14.0.0",
-    "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-prettier": "4.2.1",
-    "knip": "2.14.3",
-    "mock-fs": "5.2.0",
-    "mock-stdio": "1.0.3",
-    "nock": "13.3.1",
-    "prettier": "2.8.8",
-    "remark-cli": "11.0.0",
-    "remark-preset-webpro": "0.0.3",
-    "sinon": "15.2.0",
-    "strip-ansi": "7.1.0"
-  },
   "overrides": {
-    "@octokit/plugin-rest-endpoint-methods": "7.2.2"
-  },
-  "engines": {
-    "node": ">=16"
+    "pac-resolver": "7.0.1",
+    "socks": "2.8.3"
   },
   "remarkConfig": {
     "plugins": [
-      "preset-webpro"
+      "preset-web"
     ]
-  }
+  },
+  "repository": "gitreleaser/gitreleaser.git",
+  "scripts": {
+    "docs": "remark README.md 'docs/**/*.md' '.github/*.md' -o",
+    "format": "prettier --write eslint.config.mjs \"{lib,test}/**/*.js\"",
+    "knip": "knip",
+    "lint": "eslint lib test",
+    "release": "./bin/gitreleaser.js",
+    "test": "ava --no-worker-threads && installed-check --ignore ava"
+  },
+  "type": "module",
+  "types": "./types/index.d.ts"
 }

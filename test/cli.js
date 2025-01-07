@@ -16,5 +16,5 @@ test('should print help', t => {
   mockStdIo.start();
   help();
   const { stdout } = mockStdIo.end();
-  t.regex(stdout, RegExp(`Release It!.+${pkg.version}`));
+  t.regex(stdout, RegExp(`GitReleaser!.+${pkg.version}`));
 });

@@ -8,6 +8,7 @@ import Log from '../lib/log.js';
 import Spinner from '../lib/spinner.js';
 import Config from '../lib/config.js';
 import runTasks from '../lib/index.js';
+import Git from '../lib/plugin/git/Git.js';
 import { mkTmpDir, gitAdd, getArgs } from './util/helpers.js';
 import ShellStub from './stub/shell.js';
 import {
@@ -22,6 +23,7 @@ import {
   interceptCreate as interceptGitHubCreate,
   interceptAsset as interceptGitHubAsset
 } from './stub/github.js';
+import { factory } from './util/index.js';
 
 const rootDir = new URL('..', import.meta.url);
 
@@ -247,6 +249,8 @@ test.serial('should release all the things (pre-release, github, gitlab)', async
   sh.exec('git tag v1.0.0');
   const sha = gitAdd('line', 'file', 'More file');
   sh.exec('git push --follow-tags');
+  const git = factory(Git);
+  const ref = (await git.getBranchName()) ?? 'HEAD';
 
   interceptGitHubAuthentication();
   interceptGitHubCollaborator({ owner, project });
@@ -270,7 +274,9 @@ test.serial('should release all the things (pre-release, github, gitlab)', async
     project,
     body: {
       name: 'Release 1.1.0-alpha.0',
+      ref,
       tag_name: 'v1.1.0-alpha.0',
+      tag_message: `${owner} ${owner}/${project} ${project}`,
       description: `Notes for ${pkgName}: ${sha}`,
       assets: {
         links: [
@@ -333,7 +339,7 @@ test.serial('should release all the things (pre-release, github, gitlab)', async
   t.true(log.obtrusive.firstCall.args[0].endsWith(`release ${pkgName} (1.0.0...1.1.0-alpha.0)`));
   t.true(log.log.firstCall.args[0].endsWith(`https://www.npmjs.com/package/${pkgName}`));
   t.true(log.log.secondCall.args[0].endsWith(`https://github.com/${owner}/${project}/releases/tag/v1.1.0-alpha.0`));
-  t.true(log.log.thirdCall.args[0].endsWith(`${project}/-/releases`));
+  t.true(log.log.thirdCall.args[0].endsWith(`${project}/-/releases/v1.1.0-alpha.0`));
   t.regex(log.log.lastCall.args[0], /Done \(in [0-9]+s\.\)/);
 
   exec.restore();
@@ -494,7 +500,7 @@ test.serial('should use custom changelog command with context', async t => {
   test.serial('should run all hooks', async t => {
     gitAdd(`{"name":"hooked","version":"1.0.0","type":"module"}`, 'package.json', 'Add package.json');
     sh.exec(`npm install ${rootDir}`);
-    const plugin = "import { Plugin } from 'release-git'; class MyPlugin extends Plugin {}; export default MyPlugin;";
+    const plugin = "import { Plugin } from 'gitreleaser'; class MyPlugin extends Plugin {}; export default MyPlugin;";
     sh.ShellString(plugin).toEnd('my-plugin.js');
 
     const hooks = {};

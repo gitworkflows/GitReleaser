@@ -25,12 +25,12 @@ Install the `dotenv-cli` package as a `devDependency`:
 npm install -D dotenv-cli
 ```
 
-Prefix the release-git script like so:
+Prefix the gitreleaser script like so:
 
 ```json
 {
   "scripts": {
-    "release": "dotenv release-git --"
+    "release": "dotenv gitreleaser --"
   }
 }
 ```
@@ -42,7 +42,7 @@ Not used often, but this script asks for the token everytime a `npm run release`
 ```json
 {
   "scripts": {
-    "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-git"
+    "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && gitreleaser"
   }
 }
 ```
@@ -52,8 +52,8 @@ Not used often, but this script asks for the token everytime a `npm run release`
 - Do not check the token into the Git repository.
 - Do not check the `.env` file into the Git repository (add it to `.gitignore`). A convention is to use a `.env.example`
   file with dummy values and add this to the repository.
-- Do not put the actual token in the release-git configuration. It will be read from the `GITHUB_TOKEN` environment
-  variable. To use something different, use e.g. `github.tokenRef="RELEASE_GIT_GITHUB_TOKEN"` (or `gitlab.tokenRef`).
+- Do not put the actual token in the gitreleaser configuration. It will be read from the `GITHUB_TOKEN` environment
+  variable. To use something different, use e.g. `github.tokenRef="RELEASE_IT_GITHUB_TOKEN"` (or `gitlab.tokenRef`).
 
 All of the above is the same for `GITLAB_TOKEN`.
 

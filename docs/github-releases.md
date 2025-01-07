@@ -5,52 +5,72 @@
 The "releases" page on GitHub projects links to a page containing the project's history, or changelog. Releases are
 attached to an existing Git tag, so make sure the [Git part][1] is configured correctly.
 
-Unsurprisingly, release-git uses this feature extensively ([release-git's releases page][2]).
+Unsurprisingly, gitreleaser uses this feature extensively ([gitreleaser's releases page][2]).
 
-See the screenshot on the right for an overview of what release-git automates.
+See the screenshot on the right for an overview of what gitreleaser automates.
 
-To add [GitHub releases][3] in your release-git flow, there are two options:
+To add [GitHub releases][3] in your gitreleaser flow, there are two options:
 
-1.  Automated. This requires a personal access token.
-2.  Manual. The GitHub web interface will be opened with pre-populated fields.
+1. Automated. This requires a personal access token.
+2. Manual. The GitHub web interface will be opened with pre-populated fields.
+
+## Configuration options
+
+| Option                   | Description                                                                     |
+| :----------------------- | :------------------------------------------------------------------------------ |
+| `github.release`         | Set to `false` to skip the GitHub publish step                                  |
+| `github.releaseName`     | Set the release name (default: `Release ${version}`)                            |
+| `github.releaseNotes`    | Override the release notes with custom notes                                    |
+| `github.autoGenerate`    | Let GitHub generate release notes                                               |
+| `github.preRelease`      | Set the release to a pre-release status                                         |
+| `github.draft`           | Set the release to a draft status                                               |
+| `github.tokenRef`        | GitHub token environment variable name (default: `GITHUB_TOKEN`)                |
+| `github.assets`          | Glob pattern path to assets to add to the GitHub release                        |
+| `github.host`            | Use a different host from what would be derived from the Git URL                |
+| `github.timeout`         | Timeout duration to wait for a response from the GitHub API                     |
+| `github.proxy`           | If the release is performed behind a proxy, set this to string of the proxy URL |
+| `github.skipChecks`      | Skip checks on `GITHUB_TOKEN` environment variable and user permissions         |
+| `github.web`             | Explicitly override checking if the `GITHUB_TOKEN` is set                       |
+| `github.comments.submit` | Submit a comment to each merged PR and closed issue part of the release         |
+| `github.comments.issue`  | The text to add to the associated closed issues                                 |
+| `github.comments.pr`     | The text to add to the associated merged pull requests                          |
 
 ## Automated
 
 To automate the release (using the GitHub REST API), the following needs to be configured:
 
 - Configure `github.release: true`
-- Obtain a [personal access token][4] (release-git only needs "repo" access; no "admin" or other scopes).
+- Obtain a [personal access token][4] (gitreleaser only needs "repo" access; no "admin" or other scopes).
 - Make sure the token is [available as an environment variable][5].
 
-Do not put the actual token in the release-git configuration. It will be read from the `GITHUB_TOKEN` environment
+Do not put the actual token in the gitreleaser configuration. It will be read from the `GITHUB_TOKEN` environment
 variable. You can change this variable name by setting the `github.tokenRef` option to something else.
 
-Optionally, release-git can automatically [submit comments][6] to the merged pull requests and closed tickets to notify
+Optionally, gitreleaser can automatically [submit comments][6] to the merged pull requests and closed tickets to notify
 people in which release the fix or feature is included.
 
 ## Manual
 
-In this mode, release-git will open the default browser pointed at the GitHub web interface with the fields
-pre-populated (like the screenshot above). The data can be modified and assets can be uploaded before publishing the
-release.
+In this mode, gitreleaser will open the default browser pointed at the GitHub web interface with the fields pre-populated
+(like the screenshot above). The data can be modified and assets can be uploaded before publishing the release.
 
 - Configure `github.release: true`
 - This mode is enabled automatically when the `GITHUB_TOKEN` environment variable is not set.
 - Set `github.web: true` explicitly to override this `GITHUB_TOKEN` check.
 - Use `github.autoGenerate: true` to let GitHub generate release notes.
 
-In non-interactive CI mode (using `--ci` or in a CI environment), release-git will not open a browser, but instead print
+In non-interactive CI mode (using `--ci` or in a CI environment), gitreleaser will not open a browser, but instead print
 the url to the GitHub web interface (including data to pre-populate the fields).
 
 ## Git
 
-A GitHub release requires the corresponding Git tag to be present on the remote (release-git creates and pushes this tag
+A GitHub release requires the corresponding Git tag to be present on the remote (gitreleaser creates and pushes this tag
 automatically). Thus, in addition to the `GITHUB_TOKEN`, a public SSH key is required to push the Git tag to the remote
 repository. See [Git remotes][7] (and [CI: Git][8]) for more information.
 
 ## Prerequisite checks
 
-First, release-git will check whether the `GITHUB_TOKEN` environment variable is set. If not, it will fall back to [open
+First, gitreleaser will check whether the `GITHUB_TOKEN` environment variable is set. If not, it will fall back to [open
 the web interface][9] to publish a release (and skip the next checks). If the token is set, it will authenticate, and
 verify whether the current user is a collaborator and authorized to publish a release.
 
@@ -64,11 +84,11 @@ command-line directly: `--github.releaseName="Arcade Silver"`.
 ## Release notes
 
 By default, the output of `git.changelog` is used for the GitHub release notes. This is the printed `Changelog: ...`
-when release-git boots. This can be overridden with the `github.releaseNotes` option to customize the release notes for
+when gitreleaser boots. This can be overridden with the `github.releaseNotes` option to customize the release notes for
 the GitHub release. This will be invoked just before the actual GitHub release itself.
 
-The value can either be a string or a function but a function is only supported when configuring release-git using
-`.release-git.js` or `.release-git.cjs` file.
+The value can either be a string or a function but a function is only supported when configuring gitreleaser using
+`.gitreleaser.js` or `.gitreleaser.cjs` file.
 
 When the value is a string, it's executed as a shell script. Make sure it outputs to `stdout`. An example:
 
@@ -128,8 +148,8 @@ download from the GitHub release page. Example:
 
 ## Pre-release
 
-If the release is a pre-release (according to semver), release-git automatically sets `github.preRelease` to `true`.
-This can also be set manually.
+If the release is a pre-release (according to semver), gitreleaser automatically sets `github.preRelease` to `true`. This
+can also be set manually.
 
 ## Draft
 
@@ -140,7 +160,7 @@ In case the release should not be made public yet, set `github.draft: true`.
 Use a different host from what would be derived from the Git url (e.g. when using GitHub Enterprise).
 
 By default, the GitHub API host is [https://api.github.com][11]. Setting `github.host` to `"private.example.org"` would
-result in release-git using [https://private.example.org/api/v3][12].
+result in gitreleaser using [https://private.example.org/api/v3][12].
 
 ## Proxy
 
@@ -164,13 +184,24 @@ Use the other options to update the release, such as `--github.assets` to add as
 Example command to add assets and explicitly toggle the draft status to "published":
 
 ```bash
-release-git --no-increment --no-git --github.release --github.update --github.assets=*.zip --no-github.draft
+gitreleaser --no-increment --no-git --github.release --github.update --github.assets=*.zip --no-github.draft
 ```
+
+## Project Non-Latest Release
+
+To do a release that isn't the latest release on your GitHub project e.g for support releases, you can set
+`github.makeLatest` to `false`.
+
+## Create GitHub Discussion
+
+To auto-create GitHub Discussion for the release on your GitHub project, you can set:
+
+`github.discussionCategoryName` to `[discussion category name]`
 
 ## Comments
 
-To submit a comment to each merged pull requests and closed issue that is part of the release, set `github.comments` to
-`true`. Here are the default settings:
+To submit a comment to each merged pull requests and closed issue that is part of the release, set
+`github.comments.submit` to `true`. Here are the default settings:
 
 ```json
 {
@@ -193,9 +224,9 @@ This only works with `github.release: true` and not with [manual release via the
 Since this is an experimental feature, it's disabled by default for now. Set `github.comments: true` to enable.
 
 [1]: ./git.md
-[2]: https://github.com/release-git/release-git/releases
+[2]: https://github.com/gitreleaser/gitreleaser/releases
 [3]: https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases
-[4]: https://github.com/settings/tokens/new?scopes=repo&description=release-git
+[4]: https://github.com/settings/tokens/new?scopes=repo&description=gitreleaser
 [5]: ./environment-variables.md
 [6]: #comments
 [7]: ./git.md#git-remotes
@@ -204,4 +235,4 @@ Since this is an experimental feature, it's disabled by default for now. Set `gi
 [10]: ./changelog.md
 [11]: https://api.github.com
 [12]: https://private.example.org/api/v3
-[13]: https://github.com/release-git/release-git/releases/tag/15.10.0
+[13]: https://github.com/gitreleaser/gitreleaser/releases/tag/15.10.0

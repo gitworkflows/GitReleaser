@@ -11,7 +11,7 @@ can still be achieved. There are many solutions to this, here are some basic exa
 
 This technique is largely depending on [npm-version][4].
 
-In `.release-git.json` of the source repo:
+In `.gitreleaser.json` of the source repo:
 
 ```json
 {
@@ -46,7 +46,7 @@ A single repository, with e.g. a `dist` or `gh-pages` branch. In `package.json`:
 {
   "name": "my-package",
   "version": "1.0.0",
-  "release-git": {
+  "gitreleaser": {
     "npm": {
       "publish": false
     },
@@ -65,5 +65,5 @@ A single repository, with e.g. a `dist` or `gh-pages` branch. In `package.json`:
 
 [1]: https://github.com/components
 [2]: https://github.com/angular/bower-angular
-
+[3]: https://github.com/gitreleaser/gitreleaser/releases/tag/9.8.0
 [4]: https://docs.npmjs.com/cli/version.html
